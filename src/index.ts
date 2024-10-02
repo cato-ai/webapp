@@ -7,10 +7,9 @@ import bcrypt from "bcrypt";
 
 require("dotenv").config();
 
-const express = require("express");
-const app = express();
-const bodyParser = require("body-parser");
-const connection = require("../src/connect.ts");
+import express from "express";
+export const app = express();
+import bodyParser from "body-parser";
 
 const hostname: string = process.env.SERVER_HOSTNAME;
 const port = process.env.SERVER_PORT_NUMBER;
@@ -74,11 +73,19 @@ app.get("/v1/user/self", bodyParser.json(), async (req, res) => {
     res.end();
   } else if (urlParams.query === null && req.body !== undefined) {
     await User.findOne({ where: { email: email } })
-      .then((user) => {
-        let responseBody = user.dataValues;
-        delete responseBody["password"];
-        res.send({ data: responseBody });
-        console.log("Found User Successfully");
+      .then(async (user) => {
+        let matches = await bcrypt.compare(password, user.dataValues.password);
+        if (matches) {
+          let responseBody = user.dataValues;
+          delete responseBody["password"];
+          res.statusCode = 200;
+          res.send({ data: responseBody });
+          console.log("Found User Successfully");
+        } else {
+          res.statusCode = 401;
+          res.end();
+          console.log("401, Unauthorized user, credentials don't match");
+        }
       })
       .catch((error) => {
         console.log("400, Could not find User");
@@ -172,8 +179,7 @@ app.post("/v1/user", bodyParser.json(), async (req, res) => {
         });
     } catch (error) {
       res.statusCode = 409;
-      res.body = error;
-      res.end();
+      res.send({ message: error });
     }
   } else if (urlParams.query !== null) {
     console.error("400, Query Params present");

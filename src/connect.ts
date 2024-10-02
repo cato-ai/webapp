@@ -1,7 +1,8 @@
+import process from "process";
 import { Sequelize } from "sequelize";
 require("dotenv").config();
 
-export const connectToDb = async (res: any) => {
+export const connectToDb = async (res) => {
   const connection = new Sequelize(process.env.DB_CONNECTION_URL);
   try {
     await connection.authenticate();
