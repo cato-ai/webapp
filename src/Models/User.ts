@@ -1,8 +1,6 @@
 import { DataTypes, Model, Sequelize } from "sequelize";
 import bcrypt from "bcrypt";
-import { timeStamp } from "console";
-
-const connection = require("../connect.ts");
+import { sequelize } from "../connect";
 
 type User_Type = {
   id: typeof DataTypes.UUID;
@@ -14,14 +12,14 @@ type User_Type = {
   updatedAt: typeof DataTypes.DATE;
 };
 
-const User = connection.define(
+export const User = sequelize.define(
   "User",
   {
     id: {
       type: DataTypes.UUID,
       allowNull: false,
       primaryKey: true,
-      defaultValue: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
       get() {
         return this.getDataValue("id");
       },
@@ -36,7 +34,7 @@ const User = connection.define(
         return this.getDataValue("firstName");
       },
       set(value: string) {
-        this.setDataValue("firstname", value);
+        this.setDataValue("firstName", value);
       },
     },
     lastName: {
@@ -52,19 +50,15 @@ const User = connection.define(
     password: {
       type: DataTypes.STRING(64),
       allowNull: false,
-      validate: {
-        is: /^[0-9a-f]{64}$/i,
-      },
       set(value: string) {
-        this.setDataValue(
-          "password",
-          bcrypt.hash(value, 10, () => {})
-        );
+        const hashedPassword = bcrypt.hashSync(value, 10);
+        this.setDataValue("password", hashedPassword);
       },
     },
     email: {
       type: DataTypes.STRING,
       allowNull: false,
+      unique: true,
       get() {
         return this.getDataValue("email");
       },
@@ -72,10 +66,8 @@ const User = connection.define(
         this.setDataValue("email", value);
       },
     },
-    accountCreated: {},
   },
   {
-    connection,
     timestamps: true,
     tableName: "User",
     freezeTableName: true,
