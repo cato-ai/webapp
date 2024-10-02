@@ -5,6 +5,9 @@ require("dotenv").config();
 
 const { createServer } = require("node:http");
 
+// const express = require("express");
+// const app = express();
+
 const hostname: string = process.env.SERVER_HOSTNAME;
 const port = process.env.SERVER_PORT_NUMBER;
 

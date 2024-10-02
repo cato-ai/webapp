@@ -2,6 +2,7 @@ export const connectToDb = async (res: any) => {
   const { Sequelize } = require("sequelize");
 
   const connection = new Sequelize(process.env.DB_CONNECTION_URL);
+  module.exports = connection;
 
   try {
     await connection.authenticate();
