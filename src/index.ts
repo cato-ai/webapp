@@ -3,15 +3,13 @@ import { connectToDb } from "./connect";
 import process from "process";
 require("dotenv").config();
 
-const { createServer } = require("node:http");
-
-// const express = require("express");
-// const app = express();
+const express = require("express");
+const app = express();
 
 const hostname: string = process.env.SERVER_HOSTNAME;
 const port = process.env.SERVER_PORT_NUMBER;
 
-const server = createServer(async (req, res) => {
+app.all("/healthz", (req, res) => {
   res.setHeader("cache-control", "no-cache");
 
   const urlParams = url.parse(req.url);
@@ -56,6 +54,6 @@ const server = createServer(async (req, res) => {
   }
 });
 
-server.listen(port, hostname, () => {
+app.listen(port, () => {
   console.log(`Server running at http://${hostname}:${port}/`);
 });
