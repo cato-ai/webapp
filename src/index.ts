@@ -63,7 +63,11 @@ app.all("/healthz", (req, res) => {
 
 app.get("/v1/user/self", bodyParser.json(), async (req, res) => {
   const urlParams = url.parse(req.url);
-  if (!Object.keys(req.headers).includes("authorization")) {
+  if (req.headers["content-length"] !== undefined) {
+    res.statusCode = 400;
+    console.error("400, Get Request contains body");
+    res.end();
+  } else if (!Object.keys(req.headers).includes("authorization")) {
     res.statusCode = 401;
     console.error("401, No auth header present");
     res.end();
