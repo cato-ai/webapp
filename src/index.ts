@@ -63,15 +63,20 @@ app.all("/healthz", (req, res) => {
 
 app.get("/v1/user/self", bodyParser.json(), async (req, res) => {
   const urlParams = url.parse(req.url);
-  const authToken = req.headers.authorization;
-  const [email, password] = atob(authToken.split(" ")[1]).split(":");
-  if (
+  if (!Object.keys(req.headers).includes("authorization")) {
+    res.statusCode = 401;
+    console.error("401, No auth header present");
+    res.end();
+  } else if (
     req.headers.authorization === undefined ||
     req.headers.authorization === ""
   ) {
     res.statusCode = 401;
     res.end();
   } else if (urlParams.query === null && req.body !== undefined) {
+    const authToken = req.headers.authorization;
+    const [email, password] = atob(authToken.split(" ")[1]).split(":");
+
     await User.findOne({ where: { email: email } })
       .then(async (user) => {
         let matches = await bcrypt.compare(password, user.dataValues.password);
@@ -88,8 +93,8 @@ app.get("/v1/user/self", bodyParser.json(), async (req, res) => {
         }
       })
       .catch((error) => {
-        console.log("400, Could not find User");
-        res.statusCode = 400;
+        console.error("401, Could not find User");
+        res.statusCode = 401;
         res.end();
       });
   } else if (urlParams.query !== null) {
@@ -105,9 +110,11 @@ app.get("/v1/user/self", bodyParser.json(), async (req, res) => {
 
 app.put("/v1/user/self", bodyParser.json(), async (req, res) => {
   const urlParams = url.parse(req.url);
-  const authToken = req.headers.authorization;
-  const [email, password] = atob(authToken.split(" ")[1]).split(":");
-  if (
+  if (!Object.keys(req.headers).includes("authorization")) {
+    res.statusCode = 401;
+    console.error("401, No auth header present");
+    res.end();
+  } else if (
     req.headers.authorization === undefined ||
     req.headers.authorization === ""
   ) {
@@ -115,32 +122,57 @@ app.put("/v1/user/self", bodyParser.json(), async (req, res) => {
     res.end();
   } else if (urlParams.query === null && req.body !== undefined) {
     //Req is correct
+    const authToken = req.headers.authorization;
+    const [email, password] = atob(authToken.split(" ")[1]).split(":");
+
     try {
       const user = await User.findOne({
-        where: { email: email, password: password },
+        where: { email: email },
       });
-      await user
-        .update({
-          firstName: req.body.first_name,
-          lastName: req.body.last_name,
-          password: req.body.password,
-        })
-        .then((_user) => {
-          res.statusCode = 204;
-          res.end();
-          console.log("Updated user Successfully");
-        })
-        .catch((error) => {
-          res.statusCode = 409;
-          console.log(
-            "409, Conflict, could not find User with given auth Token"
-          );
-          res.send({ message: error });
-        });
+      let matches = await bcrypt.compare(password, user.dataValues.password);
+      if (matches && !Object.keys(req.body).includes("email")) {
+        await user
+          .update({
+            firstName:
+              req.body.first_name == ""
+                ? user.dataValues.firstName
+                : req.body.first_name,
+            lastName:
+              req.body.last_name == ""
+                ? user.dataValues.lastName
+                : req.body.last_name,
+            password:
+              req.body.password == ""
+                ? user.dataValues.password
+                : req.body.password,
+          })
+          .then((_user) => {
+            res.statusCode = 204;
+            res.end();
+            console.log("Updated user Successfully");
+          })
+          .catch((error) => {
+            res.statusCode = 409;
+            console.error(
+              "409, Conflict, could not find User with given credentials"
+            );
+            res.send({ message: error });
+          });
+      } else if (Object.keys(req.body).includes("email")) {
+        res.statusCode = 400;
+        console.error("400, email cannot be updated");
+        res.end();
+      } else {
+        res.statusCode = 401;
+        console.error("401, Credentials don't match");
+        res.send();
+      }
     } catch (error) {
-      res.statusCode = 400;
-      console.log("400, Error in updating User");
-      res.send({ message: error });
+      res.statusCode = 401;
+      console.error(
+        "401, Error in Locating and Updating User, might have wrong credentials"
+      );
+      res.send({ message: error.message });
     }
   } else if (urlParams.query !== null) {
     console.error("400, Query Params present");
@@ -174,7 +206,10 @@ app.post("/v1/user", bodyParser.json(), async (req, res) => {
           console.log("Created User Successfully");
         })
         .catch((error) => {
-          res.statusCode = 409;
+          res.statusCode = 400;
+          console.error(
+            "400, error in creating suer, constriant violation likely"
+          );
           res.send({ message: error });
         });
     } catch (error) {

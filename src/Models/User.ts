@@ -36,6 +36,9 @@ export const User = sequelize.define(
       set(value: string) {
         this.setDataValue("firstName", value);
       },
+      validate: {
+        is: /^[a-zA-Z]+$/,
+      },
     },
     lastName: {
       type: DataTypes.STRING,
@@ -45,6 +48,9 @@ export const User = sequelize.define(
       },
       set(value: string) {
         this.setDataValue("lastName", value);
+      },
+      validate: {
+        is: /^[a-zA-Z]+$/,
       },
     },
     password: {
@@ -64,6 +70,9 @@ export const User = sequelize.define(
       },
       set(value: string) {
         this.setDataValue("email", value);
+      },
+      validate: {
+        is: /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/,
       },
     },
   },
