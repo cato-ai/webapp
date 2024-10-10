@@ -23,6 +23,7 @@ jobs:
       - name: Run DB
         run: |
           sudo systemctl start postgresql
+          sudo systemctl enable postgresql
 
       - name: Docker Check
         run: |
@@ -43,10 +44,11 @@ jobs:
 
       - name: Setup DB
         run: |
-          PGPASSWORD="${{ secrets.DB_PGPASSWORD }}" psql -h localhost -U postgres -c "CREATE USER ${{ secrets.DB_USERNAME }} WITH PASSWORD ${{ secrets.DB_PASSWORD }};"
-          PGPASSWORD="${{ secrets.DB_PGPASSWORD }}" psql -h localhost -U postgres -c "CREATE DATABASE ${{ secrets.DB_NAME }};"
-          PGPASSWORD="${{ secrets.DB_PGPASSWORD }}" psql -h localhost -U postgres -c "GRANT ALL ON DATABASE ${{ secrets.DB_NAME }} to ${{ secrets.DB_USERNAME }};"
-          PGPASSWORD="${{ secrets.DB_PGPASSWORD }}" psql -h localhost -U postgres -c "ALTER DATABASE ${{ secrets.DB_NAME }} OWNER TO ${{ secrets.DB_USERNAME }};"
+          sudo -u postgres psql -c "CREATE USER ${{ secrets.DB_USERNAME }} WITH PASSWORD ${{ secrets.DB_PASSWORD }};"
+          sudo -u postgres psql -c "CREATE DATABASE ${{ secrets.DB_NAME }};"
+          sudo -u postgres psql -c "GRANT ALL ON DATABASE ${{ secrets.DB_NAME }} to ${{ secrets.DB_USERNAME }};"
+          sudo -u postgres psql -c "ALTER DATABASE ${{ secrets.DB_NAME }} OWNER TO ${{ secrets.DB_USERNAME }};"
+          sudo systemctl restart postgresql
 
       - name: Install Dependencies
         run: npm install
