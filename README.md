@@ -2,6 +2,11 @@
 
 Cloud Integration with CI/CD of a basic backend service with database and APIs
 
+B
+U
+M
+P
+!
 To Run the project
 
 ```
