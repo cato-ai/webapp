@@ -10,12 +10,6 @@ jobs:
     name: npm Install and Test Worklflow
     runs-on: ubuntu-24.04
 
-    services:
-      postgres:
-        image: postgres:16
-        ports:
-          - 5432:5432
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -23,35 +17,29 @@ jobs:
       - name: Run DB
         run: |
           sudo systemctl start postgresql
-
-      - name: Docker Check
-        run: |
-          docker ps
+          sudo systemctl enable postgresql
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: "22.9.0"
 
-      - name: Set environment variables
-        env:
-          DB_CONNECTION_URL: ${{ secrets.DB_CONNECTION_URL }}
-          SERVER_HOSTNAME: ${{ secrets.SERVER_HOSTNAME }}
-          SERVER_PORT_NUMBER: ${{ secrets.SERVER_PORT_NUMBER }}
-        run: |
-          echo "Environment variables set from GitHub Secrets"
-
       - name: Setup DB
         run: |
-          PGPASSWORD="${{ secrets.DB_PGPASSWORD }}" psql -h localhost -U postgres -c "CREATE USER ${{ secrets.DB_USERNAME }} WITH PASSWORD ${{ secrets.DB_PASSWORD }};"
-          PGPASSWORD="${{ secrets.DB_PGPASSWORD }}" psql -h localhost -U postgres -c "CREATE DATABASE ${{ secrets.DB_NAME }};"
-          PGPASSWORD="${{ secrets.DB_PGPASSWORD }}" psql -h localhost -U postgres -c "GRANT ALL ON DATABASE ${{ secrets.DB_NAME }} to ${{ secrets.DB_USERNAME }};"
-          PGPASSWORD="${{ secrets.DB_PGPASSWORD }}" psql -h localhost -U postgres -c "ALTER DATABASE ${{ secrets.DB_NAME }} OWNER TO ${{ secrets.DB_USERNAME }};"
+          sudo -u postgres psql -c "CREATE USER ${{ secrets.DB_USERNAME }} WITH PASSWORD '${{ secrets.DB_PASSWORD }}';"
+          sudo -u postgres psql -c "CREATE DATABASE ${{ secrets.DB_NAME }};"
+          sudo -u postgres psql -c "GRANT ALL ON DATABASE ${{ secrets.DB_NAME }} to ${{ secrets.DB_USERNAME }};"
+          sudo -u postgres psql -c "ALTER DATABASE ${{ secrets.DB_NAME }} OWNER TO ${{ secrets.DB_USERNAME }};"
+          sudo systemctl restart postgresql
 
       - name: Install Dependencies
         run: npm install
 
       - name: Test Cases
+        env:
+          DB_CONNECTION_URL: ${{ secrets.DB_CONNECTION_URL }}
+          SERVER_HOSTNAME: ${{ secrets.SERVER_HOSTNAME }}
+          SERVER_PORT_NUMBER: ${{ secrets.SERVER_PORT_NUMBER }}
         run: npm test
 
       - name: Build App
