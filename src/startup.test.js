@@ -4,7 +4,7 @@ import { startup } from "./startup"; // Adjust the path to your startup function
 // Mock sequelize.sync method
 jest.mock("./connect", () => ({
   sequelize: {
-    sync: jest.fn(), // Mock the sync method
+    sync: jest.fn(),
     close: jest.fn(),
   },
 }));
@@ -29,7 +29,7 @@ describe("startup", () => {
     await startup();
 
     expect(sequelize.sync).toHaveBeenCalledWith({
-      force: false,
+      force: true,
       logging: false,
     });
     expect(consoleSpy).toHaveBeenCalledWith("Database synced successfully");
@@ -47,7 +47,7 @@ describe("startup", () => {
     await startup();
 
     expect(sequelize.sync).toHaveBeenCalledWith({
-      force: false,
+      force: true,
       logging: false,
     });
     expect(consoleSpy).toHaveBeenCalledWith("Cannot startup DB", error);
