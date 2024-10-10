@@ -43,10 +43,10 @@ jobs:
 
       - name: Setup DB
         run: |
-          psql -h localhost -U postgres -c "CREATE USER ${{ secrets.DB_USERNAME }} WITH PASSWORD ${{ secrets.DB_PASSWORD }};"
-          psql -h localhost -U postgres -c "CREATE DATABASE ${{ secrets.DB_NAME }};"
-          psql -h localhost -U postgres -c "GRANT ALL ON DATABASE ${{ secrets.DB_NAME }} to ${{ secrets.DB_USERNAME }};"
-          psql -h localhost -U postgres -c "ALTER DATABASE ${{ secrets.DB_NAME }} OWNER TO ${{ secrets.DB_USERNAME }};"
+          PGPASSWORD="${{ secrets.DB_PGPASSWORD }}" psql -h localhost -U postgres -c "CREATE USER ${{ secrets.DB_USERNAME }} WITH PASSWORD ${{ secrets.DB_PASSWORD }};"
+          PGPASSWORD="${{ secrets.DB_PGPASSWORD }}" psql -h localhost -U postgres -c "CREATE DATABASE ${{ secrets.DB_NAME }};"
+          PGPASSWORD="${{ secrets.DB_PGPASSWORD }}" psql -h localhost -U postgres -c "GRANT ALL ON DATABASE ${{ secrets.DB_NAME }} to ${{ secrets.DB_USERNAME }};"
+          PGPASSWORD="${{ secrets.DB_PGPASSWORD }}" psql -h localhost -U postgres -c "ALTER DATABASE ${{ secrets.DB_NAME }} OWNER TO ${{ secrets.DB_USERNAME }};"
 
       - name: Install Dependencies
         run: npm install
