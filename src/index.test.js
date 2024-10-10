@@ -175,53 +175,53 @@ describe("GET /v1/user/self", () => {
     expect(res.statusCode).toBe(400);
   });
 
-  //   it("should return 401 if password comparison fails", async () => {
-  //     const mockUser = {
-  //       dataValues: {
-  //         email: "test@example.com",
-  //         password: "hashedPassword",
-  //       },
-  //     };
+  it("should return 401 if password comparison fails", async () => {
+    const mockUser = {
+      dataValues: {
+        email: "test@example.com",
+        password: "hashedPassword",
+      },
+    };
 
-  //     User.findOne.mockResolvedValue(mockUser);
-  //     bcrypt.compare = jest.fn();
+    User.findOne.mockResolvedValue(mockUser);
+    bcrypt.compare = jest.fn();
 
-  //     // bcrypt.compare.mockResolvedValue(false);
+    // bcrypt.compare.mockResolvedValue(false);
 
-  //     const res = await request(app)
-  //       .get("/v1/user/self")
-  //       .set(
-  //         "Authorization",
-  //         "Basic " +
-  //           Buffer.from("test@example.com:wrongPassword").toString("base64")
-  //       );
+    const res = await request(app)
+      .get("/v1/user/self")
+      .set(
+        "Authorization",
+        "Basic " +
+          Buffer.from("test@example.com:wrongPassword").toString("base64")
+      );
 
-  //     expect(res.statusCode).toBe(401);
-  //   });
+    expect(res.statusCode).toBe(401);
+  });
 
-  //   it("should return 200 and user data if credentials are valid", async () => {
-  //     const mockUser = {
-  //       dataValues: {
-  //         email: "test@example.com",
-  //         password: "hashedPassword",
-  //         id: 1,
-  //         name: "John Doe",
-  //       },
-  //     };
+  it("should return 200 and user data if credentials are valid", async () => {
+    const mockUser = {
+      dataValues: {
+        email: "test@example.com",
+        password: "hashedPassword",
+        id: 1,
+        name: "John Doe",
+      },
+    };
 
-  //     User.findOne.mockResolvedValue(mockUser);
+    User.findOne.mockResolvedValue(mockUser);
 
-  //     // bcrypt.compare.mockResolvedValue(true);
+    // bcrypt.compare.mockResolvedValue(true);
 
-  //     const res = await request(app)
-  //       .get("/v1/user/self")
-  //       .set(
-  //         "Authorization",
-  //         "Basic " +
-  //           Buffer.from("test@example.com:correctPassword").toString("base64")
-  //       );
+    const res = await request(app)
+      .get("/v1/user/self")
+      .set(
+        "Authorization",
+        "Basic " +
+          Buffer.from("test@example.com:correctPassword").toString("base64")
+      );
 
-  //     expect(res.statusCode).toBe(401);
-  //     expect(res.body.data).toEqual(undefined);
-  //   });
+    expect(res.statusCode).toBe(401);
+    expect(res.body.data).toEqual(undefined);
+  });
 });
