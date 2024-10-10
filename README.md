@@ -2,12 +2,6 @@
 
 Cloud Integration with CI/CD of a basic backend service with database and APIs
 
-B
-U
-M
-P
-!
-New Bump
 To Run the project
 
 ```
