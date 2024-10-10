@@ -1,16 +1,24 @@
 import bcrypt from "bcrypt";
-import { sequelize } from "../connect";
 import { User } from "./User";
+import { sequelize } from "../connect";
+// jest.mock("./User");
+// jest.mock("bcrypt", () => ({
+//   compare: jest.fn(), // Mock the comapre method
+// }));
 
 describe("User Model", () => {
   beforeAll(async () => {
-    // Sync database to make sure we have the proper model/table setup
     await sequelize.sync({ force: true });
   });
 
+  beforeEach(async () => {
+    User.findOne = jest.fn();
+  });
+
   afterAll(async () => {
-    // Close the database connection after the tests
     await sequelize.close();
+    jest.clearAllMocks();
+    jest.clearAllTimers();
   });
 
   test("should create a User model instance", async () => {
@@ -47,10 +55,11 @@ describe("User Model", () => {
       lastName: "Doe",
       email: "john.doe@example.com",
       password: "plaintextpassword",
+    }).then((usr) => {
+      console.log(usr, "USER");
     });
 
     try {
-      // Try creating another user with the same email
       await User.create({
         firstName: "Jane",
         lastName: "Doe",

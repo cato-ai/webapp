@@ -1,4 +1,4 @@
-import { connectToDb } from "./connect"; // Adjust the path to your module
+import { connectToDb, sequelize } from "./connect"; // Adjust the path to your module
 import { Sequelize } from "sequelize";
 
 // Mocking the Sequelize class
@@ -8,8 +8,8 @@ jest.mock("dotenv", () => ({
 }));
 
 describe("Database connection tests", () => {
-  let mockSequelizeInstance: any;
-  let mockAuthenticate: jest.Mock;
+  let mockSequelizeInstance;
+  let mockAuthenticate;
 
   beforeAll(() => {
     process.env.DB_CONNECTION_URL = "mock-db-connection-url"; // Mocking env variable
@@ -26,6 +26,12 @@ describe("Database connection tests", () => {
 
   afterEach(() => {
     jest.clearAllMocks(); // Clear mocks after each test to avoid interference
+  });
+
+  afterAll(async () => {
+    await sequelize.close();
+    jest.clearAllMocks();
+    jest.clearAllTimers();
   });
 
   it("should return 200 if the connection is successful", async () => {

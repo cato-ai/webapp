@@ -5,12 +5,19 @@ import { startup } from "./startup"; // Adjust the path to your startup function
 jest.mock("./connect", () => ({
   sequelize: {
     sync: jest.fn(), // Mock the sync method
+    close: jest.fn(),
   },
 }));
 
 describe("startup", () => {
   beforeEach(() => {
     jest.clearAllMocks(); // Clear mocks before each test
+  });
+
+  afterAll(async () => {
+    await sequelize.close();
+    jest.clearAllMocks();
+    jest.clearAllTimers();
   });
 
   it("should log 'Database synced successfully' on successful sync", async () => {
