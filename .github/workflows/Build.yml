@@ -20,6 +20,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Run DB
+        run: |
+          sudo systemctl start postgresql
+
+      - name: Docker Check
+        run: |
+          docker ps
+
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
