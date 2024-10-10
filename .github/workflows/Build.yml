@@ -44,7 +44,7 @@ jobs:
 
       - name: Setup DB
         run: |
-          sudo -u postgres psql -c "CREATE USER ${{ secrets.DB_USERNAME }} WITH PASSWORD ${{ secrets.DB_PASSWORD }};"
+          sudo -u postgres psql -c "CREATE USER ${{ secrets.DB_USERNAME }} WITH PASSWORD '${{ secrets.DB_PASSWORD }}'';"
           sudo -u postgres psql -c "CREATE DATABASE ${{ secrets.DB_NAME }};"
           sudo -u postgres psql -c "GRANT ALL ON DATABASE ${{ secrets.DB_NAME }} to ${{ secrets.DB_USERNAME }};"
           sudo -u postgres psql -c "ALTER DATABASE ${{ secrets.DB_NAME }} OWNER TO ${{ secrets.DB_USERNAME }};"
