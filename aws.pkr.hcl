@@ -28,19 +28,19 @@ variable "source_ami" {
 }
 
 variable "DB_CONNECTION_URL" {
-  type = string
+  type    = string
   default = ""
 
 }
 
 variable "SERVER_HOSTNAME" {
-  type = string
+  type    = string
   default = ""
 
 }
 
 variable "SERVER_PORT_NUMBER" {
-  type = string
+  type    = string
   default = ""
 
 }
