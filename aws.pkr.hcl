@@ -154,7 +154,7 @@ build {
       #Move files
       "sudo mv /tmp/webapp.zip /opt/",
       "sudo chmod -R 777 /opt/webapp.zip",
-      "sudo unzip /opt/webapp.zip",
+      "sudo unzip /opt/webapp.zip -d webapp",
       "sudo ls -al /opt",
       "sudo mv /tmp/run_webapp.sh /opt/",
       "sudo mv /tmp/csye6225.service /etc/systemd/system/",
