@@ -23,13 +23,29 @@ jobs:
         with:
           packer-version: 1.11.2
 
+      - name: Create Env file
+        id: env
+        run: touch .env && cat
+
+      - name: Put DB_CONNECTION_URL
+        id: env
+        run: echo ${{ secrets.DB_CONNECTION_URL }} >> .env
+
+      - name: Put SERVER_HOSTNAME
+        id: env
+        run: echo ${{ secrets.SERVER_HOSTNAME }} >> .env
+
+      - name: Put SERVER_PORT_NUMBER
+        id: env
+        run: echo ${{ secrets.SERVER_PORT_NUMBER }} >> .env
+
       - name: Install zip
         uses: montudor/action-zip@v1.0.0
         id: zip
 
       - name: Zip required files into webapp.zip
         id: zipppp
-        run: zip -r webapp.zip src tsconfig.json package.json bable.config.js nodemon.json
+        run: zip -r webapp.zip src tsconfig.json package.json bable.config.js nodemon.json .env
 
       - name: Initialize Packer
         id: init

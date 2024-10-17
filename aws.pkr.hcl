@@ -121,12 +121,12 @@ build {
 
   provisioner "shell" {
     environment_vars = [
-      "DEBIAN_FRONTEND=noninteractive",
       "CEHCKPOINT_DISABLE=1",
     ]
 
     inline = [
       # apt upgrade
+      "export DEBIAN_FRONTEND=noninteractive",
       "sudo apt-get update",
       "sudo apt-get upgrade -y",
 
@@ -139,11 +139,17 @@ build {
       "sudo mv /tmp/run_webapp.sh /opt/",
       "sudo mv /tmp/csye6225.service /etc/systemd/system/",
 
-      #unzip all required files
+      #Chown for csye6225
+      "sudo chown -R csye6225:csye6225 /opt/webapp",
       
       
       #Run shell script for setting up DB and unzipping application
-      "bash /opt/webapp/run_webapp.sh ${var.DB_USERNAME} ${var.DB_PASSWORD} ${var.DB_NAME}",
+      "sudo bash /opt/run_webapp.sh ${var.DB_USERNAME} ${var.DB_PASSWORD} ${var.DB_NAME}",
+
+      # Run systemctl services for the app
+      "sudo systemctl daemon-reload",
+      "sudo systemctl start csye6225.service",
+      "sudo systemctl enable csye6225.service"
 
       "sudo apt-get clean",
     ]

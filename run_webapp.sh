@@ -80,12 +80,12 @@ if [ $? -ne 0 ]; then
 fi
 
 
-echo -e "\n\n\n\n Starting the application...\n\n\n"
-npm start
-if [ $? -ne 0 ]; then
-   echo "npm start failed!"
-   exit 1
-fi
+# echo -e "\n\n\n\n Starting the application...\n\n\n"
+# npm start
+# if [ $? -ne 0 ]; then
+#    echo "npm start failed!"
+#    exit 1
+# fi
 
 
 echo -e "\n\n\n Opening port 3000 for handling http requests with ufw..."
