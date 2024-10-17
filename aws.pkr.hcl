@@ -145,6 +145,7 @@ build {
       "export DEBIAN_FRONTEND=noninteractive",
       "sudo apt-get update",
       "sudo apt-get upgrade -y",
+      "sudo apt install unzip",
 
       #user creation
       "sudo groupadd csye6225",

@@ -6,8 +6,6 @@ command_exists() {
     command -v "$1" >/dev/null 2>&1
 }
 
-apt install unzip
-
 if [ $? -eq 0 ]; then
     echo "unzip isntalled successfully"
 else
