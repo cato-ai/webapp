@@ -28,15 +28,15 @@ jobs:
         run: touch .env && cat
 
       - name: Put DB_CONNECTION_URL
-        id: env
+        id: env-add1
         run: echo ${{ secrets.DB_CONNECTION_URL }} >> .env
 
       - name: Put SERVER_HOSTNAME
-        id: env
+        id: env-add2
         run: echo ${{ secrets.SERVER_HOSTNAME }} >> .env
 
       - name: Put SERVER_PORT_NUMBER
-        id: env
+        id: env-add3
         run: echo ${{ secrets.SERVER_PORT_NUMBER }} >> .env
 
       - name: Install zip
