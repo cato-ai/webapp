@@ -34,7 +34,7 @@ jobs:
 
       - name: Format Check
         id: fmt
-        run: packer format .
+        run: packer fmt .
 
       - name: Packer Validate
         id: validate
