@@ -30,33 +30,37 @@ variable "source_ami" {
 variable "DB_CONNECTION_URL" {
   type    = string
   default = ""
-
+  sensitive = true
 }
 
 variable "SERVER_HOSTNAME" {
   type    = string
   default = ""
-
+  sensitive = true
 }
 
 variable "SERVER_PORT_NUMBER" {
   type    = string
   default = ""
+  sensitive = true
 }
 
 variable "DB_NAME" {
   type    = string
   default = ""
+  sensitive = true
 }
 
 variable "DB_USERNAME" {
   type    = string
   default = ""
+  sensitive = true
 }
 
 variable "DB_PASSWORD" {
   type    = string
   default = ""
+  sensitive = true
 }
 
 
@@ -136,10 +140,10 @@ build {
       "sudo mv /tmp/csye6225.service /etc/systemd/system/",
 
       #unzip all required files
-
-
+      
+      
       #Run shell script for setting up DB and unzipping application
-      "bash /opt/webapp/run.sh ${var.DB_USERNAME} ${var.DB_PASSWORD} ${var.DB_NAME}",
+      "bash /opt/webapp/run_webapp.sh ${var.DB_USERNAME} ${var.DB_PASSWORD} ${var.DB_NAME}",
 
       "sudo apt-get clean",
     ]
