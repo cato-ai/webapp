@@ -160,7 +160,7 @@ build {
 
 
       #Run shell script for setting up DB and unzipping application
-      "sudo bash /opt/run_webapp.sh ${var.DB_USERNAME} \"${var.DB_PASSWORD}\" ${var.DB_NAME}",
+      "sudo bash /opt/run_webapp.sh ${var.DB_USERNAME} ${var.DB_PASSWORD} ${var.DB_NAME}",
 
       # Run systemctl services for the app
       "sudo systemctl daemon-reload",
