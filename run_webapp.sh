@@ -6,16 +6,12 @@ command_exists() {
     command -v "$1" >/dev/null 2>&1
 }
 
-apt install unzip
-
 if [ $? -eq 0 ]; then
     echo "unzip isntalled successfully"
 else
     echo "Failed to install unzip"
     exit 1
 fi
-
-unzip /opt/webapp.zip
 
 cd /opt/webapp
 
@@ -70,6 +66,9 @@ else
     echo "Failed to alter PostgreSQL db owner"
     exit 1
 fi
+
+#permisions
+sudo chown -R csye6225:csye6225 /opt/webapp/
 
 
 echo -e "\n\n Installing Node.js dependencies..."

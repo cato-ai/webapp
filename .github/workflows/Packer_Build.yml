@@ -4,12 +4,12 @@ on:
   pull_request:
     branches:
       - main
-    # types:
-    #   - closed
+    types:
+      - closed
 
 jobs:
   build:
-    # if: github.event.pull_request.merged == true
+    if: github.event.pull_request.merged == true
     name: Packer Build
     runs-on: ubuntu-24.04
 
@@ -36,15 +36,15 @@ jobs:
 
       - name: Put DB_CONNECTION_URL
         id: env-add1
-        run: echo ${{ secrets.DB_CONNECTION_URL }} >> .env
+        run: echo DB_CONNECTION_URL="${{ secrets.DB_CONNECTION_URL }}" >> .env
 
       - name: Put SERVER_HOSTNAME
         id: env-add2
-        run: echo ${{ secrets.SERVER_HOSTNAME }} >> .env
+        run: echo SERVER_HOSTNAME=${{ secrets.SERVER_HOSTNAME }} >> .env
 
       - name: Put SERVER_PORT_NUMBER
         id: env-add3
-        run: echo ${{ secrets.SERVER_PORT_NUMBER }} >> .env
+        run: echo SERVER_PORT_NUMBER=${{ secrets.SERVER_PORT_NUMBER }} >> .env
 
       - name: Install zip
         uses: montudor/action-zip@v1.0.0

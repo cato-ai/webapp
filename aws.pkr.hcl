@@ -27,6 +27,11 @@ variable "source_ami" {
   default = "ami-0866a3c8686eaeeba"
 }
 
+variable "demo_account_id" {
+  type    = string
+  default = "762233751904"
+}
+
 variable "DB_CONNECTION_URL" {
   type      = string
   default   = ""
@@ -84,7 +89,7 @@ source "amazon-ebs" "CSYE6225-04" {
 
   secret_key = "${var.RUNNER_AWS_SECRET}"
 
-  instance_type = "t2.small"
+  instance_type = "t2.medium"
 
   region = "${var.aws_region}"
 
@@ -93,6 +98,10 @@ source "amazon-ebs" "CSYE6225-04" {
   ]
 
   ami_description = "Assignment 04 AMI - CSYE 6225"
+
+  ami_users = [
+    var.demo_account_id,
+  ]
 
   source_ami = "${var.source_ami}"
 
@@ -145,6 +154,7 @@ build {
       "export DEBIAN_FRONTEND=noninteractive",
       "sudo apt-get update",
       "sudo apt-get upgrade -y",
+      "sudo apt install unzip",
 
       #user creation
       "sudo groupadd csye6225",
@@ -152,11 +162,14 @@ build {
 
       #Move files
       "sudo mv /tmp/webapp.zip /opt/",
+      "sudo chmod -R 777 /opt/webapp.zip",
+      "sudo unzip /opt/webapp.zip -d /opt/webapp",
+      "sudo ls -al /opt",
       "sudo mv /tmp/run_webapp.sh /opt/",
       "sudo mv /tmp/csye6225.service /etc/systemd/system/",
 
       #Chown for csye6225
-      "sudo chown -R csye6225:csye6225 /opt/webapp.zip",
+      "sudo chown -R csye6225:csye6225 /opt/webapp",
 
 
       #Run shell script for setting up DB and unzipping application
@@ -167,6 +180,8 @@ build {
       "sudo systemctl start csye6225.service",
       "sudo systemctl enable csye6225.service",
 
+      #Remove git
+      "sudo apt-get remove git -y",
       "sudo apt-get clean",
     ]
   }

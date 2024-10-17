@@ -1,6 +1,5 @@
 [Unit]
 Description=CSYE 6225 App
-ConditionPathExists=/opt/webapp
 After=network.target
 
 [Service]
