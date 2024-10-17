@@ -1,0 +1,20 @@
+[Unit]
+Description=CSYE 6225 App
+ConditionPathExists=/opt/csye6225/webapp
+After=network.target
+
+[Service]
+Type=simple
+Environment=/opt/csye6225/webapp/.env
+User=csye6225
+Group=csye6225
+WorkingDirectory=/opt/csye6225/webapp/
+ExecStart=/opt/csye6225/webapp/ npm run build && node build/index.js
+Restart=always
+RestartSec=3
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=csye6225
+
+[Install]
+WantedBy=multi-user.target

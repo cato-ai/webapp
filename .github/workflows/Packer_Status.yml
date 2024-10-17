@@ -1,0 +1,33 @@
+name: Packer fmt and Validate check
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  fmt_and_validate:
+    name: Packer format and validate tests
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Packer
+        uses: hashicorp/setup-packer@main
+        id: setup
+        with:
+          packer-version: 1.11.2
+
+      - name: Initialize Packer
+        id: init
+        run: packer init .
+
+      - name: Format Check
+        id: fmt
+        run: packer format aws.pkr.hcl
+
+      - name: Packer Validate
+        id: validate
+        run: packer validate aws.pkr.hcl
