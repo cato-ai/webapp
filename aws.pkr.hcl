@@ -84,7 +84,7 @@ source "amazon-ebs" "CSYE6225-04" {
 
   secret_key = "${var.RUNNER_AWS_SECRET}"
 
-  instance_type = "t2.small"
+  instance_type = "t2.medium"
 
   region = "${var.aws_region}"
 
@@ -154,7 +154,7 @@ build {
       #Move files
       "sudo mv /tmp/webapp.zip /opt/",
       "sudo unzip /opt/webapp.zip",
-      "sudo ls al",
+      "sudo ls -al /opt/webapp",
       "sudo mv /tmp/run_webapp.sh /opt/",
       "sudo mv /tmp/csye6225.service /etc/systemd/system/",
 
