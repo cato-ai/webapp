@@ -1,0 +1,41 @@
+name: Packer fmt and Validate check
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  fmt_and_validate:
+    name: Packer format and validate tests
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Packer
+        uses: hashicorp/setup-packer@main
+        id: setup
+        with:
+          packer-version: 1.11.2
+
+      - name: Install zip
+        uses: montudor/action-zip@v1.0.0
+        id: zip
+
+      - name: Zip required files into webapp.zip
+        id: zipppp
+        run: zip -r webapp.zip src tsconfig.json package.json bable.config.js nodemon.json
+
+      - name: Initialize Packer
+        id: init
+        run: packer init .
+
+      - name: Format Check
+        id: fmt
+        run: packer fmt .
+
+      - name: Packer Validate
+        id: validate
+        run: packer validate .
