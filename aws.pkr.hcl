@@ -28,15 +28,21 @@ variable "source_ami" {
 }
 
 variable "DB_CONNECTION_URL" {
-  type    = string
+  type = string
+  default = ""
+
 }
 
 variable "SERVER_HOSTNAME" {
-  type    = string
+  type = string
+  default = ""
+
 }
 
 variable "SERVER_PORT_NUMBER" {
-  type    = string
+  type = string
+  default = ""
+
 }
 
 
@@ -79,20 +85,14 @@ build {
   ]
 
   provisioner "file" {
-    source = "csye6225.service"
+    source      = "csye6225.service"
     destination = "/etc/systemd/system"
   }
 
   provisioner "file" {
-    source = "webapp.zip"
+    source      = "webapp.zip"
     destination = "/tmp/csye6225/"
   }
-
-  provisioner "file" {
-    source = "webapp.zip"
-    destination = "/tmp/csye6225/"
-  }
-
 
   provisioner "shell" {
     environment_vars = [
@@ -116,7 +116,7 @@ build {
 
       #Run shell script for setting up DB and unzipping application
       "bash /opt/webapp/run.sh",
-      
+
 
       "sudo apt-get clean",
     ]
