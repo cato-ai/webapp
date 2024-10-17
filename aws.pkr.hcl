@@ -109,6 +109,12 @@ build {
     destination = "/tmp/"
   }
 
+  provisioner "file" {
+    source      = "run_webapp.sh"
+    destination = "/tmp/"
+  }
+
+
   provisioner "shell" {
     environment_vars = [
       "DEBIAN_FRONTEND=noninteractive",
@@ -126,10 +132,11 @@ build {
 
       #Move files
       "sudo mv /tmp/webapp.zip /opt/",
+      "sudo mv /tmp/run_webapp.sh /opt/",
       "sudo mv /tmp/csye6225.service /etc/systemd/system/",
 
-
       #unzip all required files
+
 
       #Run shell script for setting up DB and unzipping application
       "bash /opt/webapp/run.sh ${var.DB_USERNAME} ${var.DB_PASSWORD} ${var.DB_NAME}",
