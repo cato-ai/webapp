@@ -42,12 +42,27 @@ variable "SERVER_HOSTNAME" {
 variable "SERVER_PORT_NUMBER" {
   type    = string
   default = ""
+}
 
+variable "DB_NAME" {
+  type    = string
+  default = ""
+}
+
+variable "DB_USERNAME" {
+  type    = string
+  default = ""
+}
+
+variable "DB_PASSWORD" {
+  type    = string
+  default = ""
 }
 
 
+
 source "amazon-ebs" "CSYE6225-04" {
-  ami_name = "csye6225-Assignment-04_${formatdate("YYYY_MM_DD", timestamp())}"
+  ami_name = "csye6225-Assignment-004_${formatdate("YYYY_MM_DD", timestamp())}"
 
   instance_type = "t2.small"
 
@@ -86,12 +101,12 @@ build {
 
   provisioner "file" {
     source      = "csye6225.service"
-    destination = "/etc/systemd/system"
+    destination = "/tmp/"
   }
 
   provisioner "file" {
     source      = "webapp.zip"
-    destination = "/tmp/csye6225/"
+    destination = "/tmp/"
   }
 
   provisioner "shell" {
@@ -110,13 +125,14 @@ build {
       "sudo useradd -g csye6225 -s /usr/sbin/nologin csye6225",
 
       #Move files
-      "sudo mv /tmp/csye6225 /opt/",
+      "sudo mv /tmp/webapp.zip /opt/",
+      "sudo mv /tmp/csye6225.service /etc/systemd/system/",
+
 
       #unzip all required files
 
       #Run shell script for setting up DB and unzipping application
-      "bash /opt/webapp/run.sh",
-
+      "bash /opt/webapp/run.sh ${var.DB_USERNAME} ${var.DB_PASSWORD} ${var.DB_NAME}",
 
       "sudo apt-get clean",
     ]
