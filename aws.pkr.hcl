@@ -110,12 +110,12 @@ build {
       "sudo useradd -g csye6225 -s /usr/sbin/nologin csye6225",
 
       #Move files
-      "sudo mv /tmp/csye6225 /opt/"
+      "sudo mv /tmp/csye6225 /opt/",
 
       #unzip all required files
 
       #Run shell script for setting up DB and unzipping application
-      "bash /opt/webapp/run.sh"
+      "bash /opt/webapp/run.sh",
       
 
       "sudo apt-get clean",
