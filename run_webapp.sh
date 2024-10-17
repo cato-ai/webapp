@@ -15,8 +15,6 @@ else
     exit 1
 fi
 
-unzip /opt/webapp.zip
-
 cd /opt/webapp
 
 apt install -y npm || exit 1

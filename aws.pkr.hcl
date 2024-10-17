@@ -152,11 +152,13 @@ build {
 
       #Move files
       "sudo mv /tmp/webapp.zip /opt/",
+      "sudo unzip /opt/webapp.zip",
+      "sudo ls al",
       "sudo mv /tmp/run_webapp.sh /opt/",
       "sudo mv /tmp/csye6225.service /etc/systemd/system/",
 
       #Chown for csye6225
-      "sudo chown -R csye6225:csye6225 /opt/webapp.zip",
+      "sudo chown -R csye6225:csye6225 /opt/webapp",
 
 
       #Run shell script for setting up DB and unzipping application
