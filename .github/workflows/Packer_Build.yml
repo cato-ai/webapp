@@ -4,12 +4,12 @@ on:
   pull_request:
     branches:
       - main
-    types:
-      - closed
+    # types:
+    #   - closed
 
 jobs:
   build:
-    if: github.event.pull_request.merged == true
+    # if: github.event.pull_request.merged == true
     name: Packer Build
     runs-on: ubuntu-24.04
 
