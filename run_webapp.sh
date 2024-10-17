@@ -34,7 +34,7 @@ fi
 
 #Section to grant permission and create user for cato_ai user
 echo -e "\n\n\nCreating PostgreSQL user..."
-sudo -u postgres psql -c " CREATE USER $1 WITH PASSWORD $2;"
+sudo -u postgres psql -c " CREATE USER $1 WITH PASSWORD \'$2\';"
 
 if [ $? -eq 0 ]; then
     echo "PostgreSQL user created successfully"
