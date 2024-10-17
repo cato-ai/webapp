@@ -181,7 +181,7 @@ build {
       "sudo systemctl enable csye6225.service",
 
       #Remove git
-      "sudo apt-get remove git",
+      "sudo apt-get remove git -y",
       "sudo apt-get clean",
     ]
   }
