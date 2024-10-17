@@ -156,7 +156,7 @@ build {
       "sudo mv /tmp/csye6225.service /etc/systemd/system/",
 
       #Chown for csye6225
-      "sudo chown -R csye6225:csye6225 /opt/webapp",
+      "sudo chown -R csye6225:csye6225 /opt/webapp.zip",
 
 
       #Run shell script for setting up DB and unzipping application
