@@ -71,6 +71,9 @@ else
     exit 1
 fi
 
+#permisions
+sudo chown -R csye6225:csye6225 /opt/webapp/
+
 
 echo -e "\n\n Installing Node.js dependencies..."
 npm install
