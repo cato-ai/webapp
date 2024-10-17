@@ -99,6 +99,10 @@ source "amazon-ebs" "CSYE6225-04" {
 
   ami_description = "Assignment 04 AMI - CSYE 6225"
 
+  ami_users = [
+    var.demo_account_id,
+  ]
+
   source_ami = "${var.source_ami}"
 
   ssh_username = "${var.ssh_username}"
