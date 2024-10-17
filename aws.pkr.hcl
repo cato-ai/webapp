@@ -28,38 +28,38 @@ variable "source_ami" {
 }
 
 variable "DB_CONNECTION_URL" {
-  type    = string
-  default = ""
+  type      = string
+  default   = ""
   sensitive = true
 }
 
 variable "SERVER_HOSTNAME" {
-  type    = string
-  default = ""
+  type      = string
+  default   = ""
   sensitive = true
 }
 
 variable "SERVER_PORT_NUMBER" {
-  type    = string
-  default = ""
+  type      = string
+  default   = ""
   sensitive = true
 }
 
 variable "DB_NAME" {
-  type    = string
-  default = ""
+  type      = string
+  default   = ""
   sensitive = true
 }
 
 variable "DB_USERNAME" {
-  type    = string
-  default = ""
+  type      = string
+  default   = ""
   sensitive = true
 }
 
 variable "DB_PASSWORD" {
-  type    = string
-  default = ""
+  type      = string
+  default   = ""
   sensitive = true
 }
 
@@ -141,15 +141,15 @@ build {
 
       #Chown for csye6225
       "sudo chown -R csye6225:csye6225 /opt/webapp",
-      
-      
+
+
       #Run shell script for setting up DB and unzipping application
       "sudo bash /opt/run_webapp.sh ${var.DB_USERNAME} ${var.DB_PASSWORD} ${var.DB_NAME}",
 
       # Run systemctl services for the app
       "sudo systemctl daemon-reload",
       "sudo systemctl start csye6225.service",
-      "sudo systemctl enable csye6225.service"
+      "sudo systemctl enable csye6225.service",
 
       "sudo apt-get clean",
     ]
