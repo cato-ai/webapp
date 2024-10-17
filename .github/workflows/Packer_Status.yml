@@ -34,8 +34,8 @@ jobs:
 
       - name: Format Check
         id: fmt
-        run: packer format aws.pkr.hcl
+        run: packer format .
 
       - name: Packer Validate
         id: validate
-        run: packer validate aws.pkr.hcl
+        run: packer validate .
