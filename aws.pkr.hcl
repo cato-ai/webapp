@@ -63,10 +63,26 @@ variable "DB_PASSWORD" {
   sensitive = true
 }
 
+variable "RUNNER_AWS_KEY" {
+  type      = string
+  default   = ""
+  sensitive = true
+}
+
+
+variable "RUNNER_AWS_SECRET" {
+  type      = string
+  default   = ""
+  sensitive = true
+}
 
 
 source "amazon-ebs" "CSYE6225-04" {
   ami_name = "csye6225-Assignment-004_${formatdate("YYYY_MM_DD", timestamp())}"
+
+  access_key = "${var.RUNNER_AWS_KEY}"
+
+  secret_key = "${var.RUNNER_AWS_SECRET}"
 
   instance_type = "t2.small"
 

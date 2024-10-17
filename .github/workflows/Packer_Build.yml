@@ -23,6 +23,13 @@ jobs:
         with:
           packer-version: 1.11.2
 
+      - name: Install AWS-cli
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: "${{ secrets.RUNNER_AWS_KEY }}"
+          aws-secret-access-key: "${{ secrets.RUNNER_AWS_SECRET }}"
+          aws-region: "${{ secrets.RUNNER_AWS_REGION }}"
+
       - name: Create Env file
         id: env
         run: touch .env && cat
@@ -61,4 +68,4 @@ jobs:
 
       - name: Packer Build
         id: build
-        run: packer build -var DB_CONNECTION_URL=${{ secrets.DB_CONNECTION_URL }} -var SERVER_HOSTNAME=${{ secrets.SERVER_HOSTNAME }} -var SERVER_PORT_NUMBER=${{ secrets.SERVER_PORT_NUMBER }} -var DB_NAME=${{ secrets.DB_NAME }}  -var DB_USERNAME=${{ secrets.DB_USERNAME }} -var DB_PASSWORD=${{ secrets.DB_PASSWORD }} aws.pkr.hcl
+        run: packer build -var DB_CONNECTION_URL=${{ secrets.DB_CONNECTION_URL }} -var SERVER_HOSTNAME=${{ secrets.SERVER_HOSTNAME }} -var SERVER_PORT_NUMBER=${{ secrets.SERVER_PORT_NUMBER }} -var DB_NAME=${{ secrets.DB_NAME }}  -var DB_USERNAME=${{ secrets.DB_USERNAME }} -var DB_PASSWORD=\'${{ secrets.DB_PASSWORD }}\' -var RUNNER_AWS_SECRET=${{ secrets.RUNNER_AWS_SECRET }} -var RUNNER_AWS_KEY=${{ secrets.RUNNER_AWS_KEY }} aws.pkr.hcl
