@@ -139,7 +139,7 @@ build {
   }
 
   provisioner "file" {
-    source      = "run_webapp.sh"
+    source      = "run_webapp.sh
     destination = "/tmp/"
   }
 
