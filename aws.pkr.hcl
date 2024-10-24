@@ -139,7 +139,7 @@ build {
   }
 
   provisioner "file" {
-    source      = "run_webapp.sh
+    source      = "run_webapp.sh"
     destination = "/tmp/"
   }
 
@@ -177,7 +177,7 @@ build {
 
       # Run systemctl services for the app
       "sudo systemctl daemon-reload",
-      "sudo systemctl start csye6225.service",
+      # "sudo systemctl start csye6225.service",
       "sudo systemctl enable csye6225.service",
 
       #Remove git
