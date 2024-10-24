@@ -3,7 +3,9 @@ import { Sequelize } from "sequelize";
 require("dotenv").config();
 
 export const connectToDb = async (res) => {
-  const connection = new Sequelize(process.env.DB_CONNECTION_URL);
+  const connection = new Sequelize(process.env.DB_CONNECTION_URL, {
+    ssl: true,
+  });
   try {
     await connection.authenticate();
 
@@ -19,4 +21,5 @@ export const connectToDb = async (res) => {
 
 export const sequelize = new Sequelize(process.env.DB_CONNECTION_URL, {
   dialect: "postgres",
+  ssl: true,
 });
