@@ -183,6 +183,9 @@ build {
       #Remove git
       "sudo apt-get remove git -y",
 
+      # install yum
+      "sudo apt install yum",
+      
       #Add cloudwatch
       "sudo yum install amazon-cloudwatch-agent",
 
