@@ -184,7 +184,7 @@ build {
       "sudo apt-get remove git -y",
 
       #Add cloudwatch
-      "sudo yum install amazon-cloudwatch-agent"
+      "sudo yum install amazon-cloudwatch-agent",
 
       "sudo apt-get clean",
     ]
