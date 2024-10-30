@@ -184,11 +184,9 @@ build {
       "sudo apt-get remove git -y",
 
       # install yum
-      "sudo apt install yum",
-      
-      #Add cloudwatch
-      "sudo yum install amazon-cloudwatch-agent",
-
+      "wget https://s3.amazonaws.com/amazoncloudwatch-agent/ubuntu/amd64/latest/amazon-cloudwatch-agent.deb",
+      "dpkg -i -E ./amazon-cloudwatch-agent.deb",
+      "apt-get update && apt-get install collectd",
       "sudo apt-get clean",
     ]
   }
