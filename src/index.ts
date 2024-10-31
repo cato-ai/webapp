@@ -20,6 +20,7 @@ import {
 import path from "path";
 import winston from "winston";
 import WinstonCloudwatch from "winston-cloudwatch";
+import { extensions } from "sequelize/types/utils/validator-extras";
 
 const hostname: string = process.env.SERVER_HOSTNAME;
 const port = process.env.SERVER_PORT_NUMBER;
@@ -325,14 +326,18 @@ app.post("/v1/user", bodyParser.json(), async (req, res) => {
 app.post(
   "/v1/user/self/pic",
   bodyParser.raw({
-    type: "image/png",
+    type: "*/*",
     limit: "10mb",
   }),
   async (req, res) => {
     statsD.increment(`api.${req.path}.post.calls`);
     const apiResponseTime = Date.now();
     res.setHeader("cache-control", "no-cache");
-    logger.info(req);
+    const extension =
+      req.headers["content-type"].split("/")[1] === undefined
+        ? "png"
+        : req.headers["content-type"].split("/")[1];
+    console.log(extension);
     const urlParams = url.parse(req.url);
     if (!Object.keys(req.headers).includes("authorization")) {
       res.statusCode = 401;
@@ -360,6 +365,7 @@ app.post(
             password,
             user.dataValues.password
           );
+
           let image_exists = await S3_Bucket.findOne({
             where: { user_id: user.dataValues.id },
           }).then((s3_data) =>
@@ -368,7 +374,7 @@ app.post(
           if (matches && !image_exists) {
             await S3_Bucket_Upload(
               user.dataValues.id,
-              `profile_pic.png`,
+              `profile_pic.${extension}`,
               req.body
             ).then((data) => {
               statsD.timing(
@@ -383,7 +389,10 @@ app.post(
               }).then((s3_data) => {
                 res.statusCode = 201;
                 res.send({
-                  data: { ...s3_data.dataValues, file_name: "profile_pic.png" },
+                  data: {
+                    ...s3_data.dataValues,
+                    file_name: `profile_pic.${extension}`,
+                  },
                 });
                 res.end();
                 statsD.timing(
@@ -414,6 +423,8 @@ app.post(
 app.get("/v1/user/self/pic", bodyParser.json(), async (req, res) => {
   statsD.increment(`api.${req.path}.get.calls`);
   const apiResponseTime = Date.now();
+  const extension = req.headers["content-type"].split("/")[1];
+
   const urlParams = url.parse(req.url);
   if (req.headers["content-length"] !== undefined) {
     res.statusCode = 400;
@@ -441,7 +452,10 @@ app.get("/v1/user/self/pic", bodyParser.json(), async (req, res) => {
             async (s3_data) => {
               res.statusCode = 200;
               res.send({
-                data: { ...s3_data.dataValues, file_name: "profile_pic.png" },
+                data: {
+                  ...s3_data.dataValues,
+                  file_name: `profile_pic.${extension}`,
+                },
               });
               logger.info("Found S3 Object Successfully");
             }
