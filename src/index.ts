@@ -18,15 +18,24 @@ import {
   S3_Bucket_Upload,
 } from "./Models/S3_Bucket";
 import path from "path";
+import winston from "winston";
 
 const hostname: string = process.env.SERVER_HOSTNAME;
 const port = process.env.SERVER_PORT_NUMBER;
 const statsD = new StatsD({
   host: "localhost",
   port: 8125,
+  prefix: "webapp",
 });
 
 startup();
+
+const logger = winston.createLogger({
+  level: "info",
+  format: winston.format.json(),
+  defaultMeta: { service: "user-service" },
+  transports: [new winston.transports.File({ filename: "webapp.log" })],
+});
 
 app.all("/healthz", (req, res) => {
   const startTime = Date.now();
@@ -38,7 +47,7 @@ app.all("/healthz", (req, res) => {
   const urlParams = url.parse(req.url);
 
   if (urlParams.query !== null) {
-    console.error("400, Query Params present");
+    logger.error("400, Query Params present");
     res.statusCode = 400;
     res.end();
   } else if (req.url === "/healthz" && req.method === "GET") {
@@ -48,7 +57,7 @@ app.all("/healthz", (req, res) => {
     });
     req.on("end", async () => {
       if (body) {
-        console.error("400, Req contains Body");
+        logger.error("400, Req contains Body");
         res.statusCode = 400;
         res.end();
       } else {
@@ -57,21 +66,21 @@ app.all("/healthz", (req, res) => {
         switch (statusCode) {
           case 200:
             res.end();
-            console.info("200, OK!");
+            logger.info("200, OK!");
             break;
           case 503:
             res.end();
-            console.error("503, Cannot connect to DB!");
+            logger.error("503, Cannot connect to DB!");
             break;
         }
       }
     });
   } else if (req.url === "/healthz" && req.method !== "GET") {
-    console.error("405, Wrong Type of Request");
+    logger.error("405, Wrong Type of Request");
     res.statusCode = 405;
     res.end();
   } else {
-    console.error("404,  Not found");
+    logger.error("404,  Not found");
     res.statusCode = 404;
     res.end();
   }
@@ -85,11 +94,11 @@ app.get("/v1/user/self", bodyParser.json(), async (req, res) => {
   const urlParams = url.parse(req.url);
   if (req.headers["content-length"] !== undefined) {
     res.statusCode = 400;
-    console.error("400, Get Request contains body");
+    logger.error("400, Get Request contains body");
     res.end();
   } else if (!Object.keys(req.headers).includes("authorization")) {
     res.statusCode = 401;
-    console.error("401, No auth header present");
+    logger.error("401, No auth header present");
     res.end();
   } else if (
     req.headers.authorization === undefined ||
@@ -109,11 +118,11 @@ app.get("/v1/user/self", bodyParser.json(), async (req, res) => {
           delete responseBody["password"];
           res.statusCode = 200;
           res.send({ data: responseBody });
-          console.log("Found User Successfully");
+          logger.info("Found User Successfully");
         } else {
           res.statusCode = 401;
           res.end();
-          console.log("401, Unauthorized user, credentials don't match");
+          logger.info("401, Unauthorized user, credentials don't match");
         }
         statsD.timing(
           `db.retrieve.${req.path}.get.response_time`,
@@ -121,16 +130,16 @@ app.get("/v1/user/self", bodyParser.json(), async (req, res) => {
         );
       })
       .catch((error) => {
-        console.error("401, Could not find User");
+        logger.error("401, Could not find User");
         res.statusCode = 401;
         res.end();
       });
   } else if (urlParams.query !== null) {
-    console.error("400, Query Params present");
+    logger.error("400, Query Params present");
     res.statusCode = 400;
     res.end();
   } else {
-    console.error("400, Bad request");
+    logger.error("400, Bad request");
     res.statusCode = 400;
     res.end();
   }
@@ -146,7 +155,7 @@ app.put("/v1/user/self", bodyParser.json(), async (req, res) => {
   const urlParams = url.parse(req.url);
   if (!Object.keys(req.headers).includes("authorization")) {
     res.statusCode = 401;
-    console.error("401, No auth header present");
+    logger.error("401, No auth header present");
     res.end();
   } else if (
     req.headers.authorization === undefined ||
@@ -184,11 +193,11 @@ app.put("/v1/user/self", bodyParser.json(), async (req, res) => {
           .then((_user) => {
             res.statusCode = 204;
             res.end();
-            console.log("Updated user Successfully");
+            logger.info("Updated user Successfully");
           })
           .catch((error) => {
             res.statusCode = 409;
-            console.error(
+            logger.error(
               "409, Conflict, could not find User with given credentials"
             );
             res.send({ message: error });
@@ -199,26 +208,26 @@ app.put("/v1/user/self", bodyParser.json(), async (req, res) => {
         );
       } else if (Object.keys(req.body).includes("email")) {
         res.statusCode = 400;
-        console.error("400, email cannot be updated");
+        logger.error("400, email cannot be updated");
         res.end();
       } else {
         res.statusCode = 401;
-        console.error("401, Credentials don't match");
+        logger.error("401, Credentials don't match");
         res.send();
       }
     } catch (error) {
       res.statusCode = 401;
-      console.error(
+      logger.error(
         "401, Error in Locating and Updating User, might have wrong credentials"
       );
       res.send({ message: error.message });
     }
   } else if (urlParams.query !== null) {
-    console.error("400, Query Params present");
+    logger.error("400, Query Params present");
     res.statusCode = 400;
     res.end();
   } else {
-    console.error("400, Bad request");
+    logger.error("400, Bad request");
     res.statusCode = 400;
     res.end();
   }
@@ -250,11 +259,11 @@ app.post("/v1/user", bodyParser.json(), async (req, res) => {
           let responseBody = user.dataValues;
           delete responseBody["password"];
           res.send({ data: responseBody });
-          console.log("Created User Successfully");
+          logger.info("Created User Successfully");
         })
         .catch((error) => {
           res.statusCode = 400;
-          console.error(
+          logger.error(
             "400, error in creating user, constriant violation likely"
           );
           res.send({ message: error });
@@ -268,12 +277,12 @@ app.post("/v1/user", bodyParser.json(), async (req, res) => {
       res.send({ message: error });
     }
   } else if (urlParams.query !== null) {
-    console.error("400, Query Params present");
+    logger.error("400, Query Params present");
 
     res.statusCode = 400;
     res.end();
   } else {
-    console.error("400, Bad request");
+    logger.error("400, Bad request");
     res.statusCode = 400;
     res.end();
   }
@@ -294,11 +303,11 @@ app.post(
     statsD.increment(`api.${req.path}.post.calls`);
     const apiResponseTime = Date.now();
     res.setHeader("cache-control", "no-cache");
-    console.log(req);
+    logger.info(req);
     const urlParams = url.parse(req.url);
     if (!Object.keys(req.headers).includes("authorization")) {
       res.statusCode = 401;
-      console.error("401, No auth header present");
+      logger.error("401, No auth header present");
       res.end();
     } else if (
       req.headers.authorization === undefined ||
@@ -327,7 +336,6 @@ app.post(
           }).then((s3_data) =>
             s3_data === null || s3_data === undefined ? false : true
           );
-          console.log(image_exists, "AAAA");
           if (matches && !image_exists) {
             await S3_Bucket_Upload(
               user.dataValues.id,
@@ -362,7 +370,7 @@ app.post(
           }
         });
       } catch (err) {
-        console.error(err);
+        logger.error(err);
         res.statusCode = 400;
         res.end();
       }
@@ -380,11 +388,11 @@ app.get("/v1/user/self/pic", bodyParser.json(), async (req, res) => {
   const urlParams = url.parse(req.url);
   if (req.headers["content-length"] !== undefined) {
     res.statusCode = 400;
-    console.error("400, Get Request contains body");
+    logger.error("400, Get Request contains body");
     res.end();
   } else if (!Object.keys(req.headers).includes("authorization")) {
     res.statusCode = 401;
-    console.error("401, No auth header present");
+    logger.error("401, No auth header present");
     res.end();
   } else if (
     req.headers.authorization === undefined ||
@@ -406,13 +414,13 @@ app.get("/v1/user/self/pic", bodyParser.json(), async (req, res) => {
               res.send({
                 data: { ...s3_data.dataValues, file_name: "profile_pic.png" },
               });
-              console.log("Found S3 Object Successfully");
+              logger.info("Found S3 Object Successfully");
             }
           );
         } else {
           res.statusCode = 401;
           res.end();
-          console.log("401, Unauthorized user, credentials don't match");
+          logger.info("401, Unauthorized user, credentials don't match");
         }
         statsD.timing(
           `db.retrieve.${req.path}.get.response_time`,
@@ -420,16 +428,16 @@ app.get("/v1/user/self/pic", bodyParser.json(), async (req, res) => {
         );
       })
       .catch((error) => {
-        console.error("401, Could not find User");
+        logger.error("401, Could not find User");
         res.statusCode = 401;
         res.end();
       });
   } else if (urlParams.query !== null) {
-    console.error("400, Query Params present");
+    logger.error("400, Query Params present");
     res.statusCode = 400;
     res.end();
   } else {
-    console.error("400, Bad request");
+    logger.error("400, Bad request");
     res.statusCode = 400;
     res.end();
   }
@@ -445,7 +453,7 @@ app.delete("/v1/user/self/pic", bodyParser.json(), async (req, res) => {
   const urlParams = url.parse(req.url);
   if (!Object.keys(req.headers).includes("authorization")) {
     res.statusCode = 401;
-    console.error("401, No auth header present");
+    logger.error("401, No auth header present");
     res.end();
   } else if (
     req.headers.authorization === undefined ||
@@ -467,7 +475,7 @@ app.delete("/v1/user/self/pic", bodyParser.json(), async (req, res) => {
                 s3_data.destroy().then((data) => {
                   res.statusCode = 204;
                   res.end();
-                  console.log("Deleted s3 object successfully");
+                  logger.info("Deleted s3 object successfully");
                 });
               });
             }
@@ -475,7 +483,7 @@ app.delete("/v1/user/self/pic", bodyParser.json(), async (req, res) => {
         } else {
           res.statusCode = 401;
           res.end();
-          console.log("401, Unauthorized user, credentials don't match");
+          logger.info("401, Unauthorized user, credentials don't match");
         }
         statsD.timing(
           `db.retrieve.${req.path}.get.response_time`,
@@ -483,16 +491,16 @@ app.delete("/v1/user/self/pic", bodyParser.json(), async (req, res) => {
         );
       })
       .catch((error) => {
-        console.error("401, Could not find User");
+        logger.error("401, Could not find User");
         res.statusCode = 401;
         res.end();
       });
   } else if (urlParams.query !== null) {
-    console.error("400, Query Params present");
+    logger.error("400, Query Params present");
     res.statusCode = 400;
     res.end();
   } else {
-    console.error("400, Bad request");
+    logger.error("400, Bad request");
     res.statusCode = 400;
     res.end();
   }
@@ -503,5 +511,5 @@ app.delete("/v1/user/self/pic", bodyParser.json(), async (req, res) => {
 });
 
 app.listen(port, () => {
-  console.log(`Server running at http://${hostname}:${port}/`);
+  logger.info(`Server running at http://${hostname}:${port}/`);
 });
