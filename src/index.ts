@@ -19,6 +19,7 @@ import {
 } from "./Models/S3_Bucket";
 import path from "path";
 import winston from "winston";
+import WinstonCloudwatch from "winston-cloudwatch";
 
 const hostname: string = process.env.SERVER_HOSTNAME;
 const port = process.env.SERVER_PORT_NUMBER;
@@ -30,11 +31,39 @@ const statsD = new StatsD({
 
 startup();
 
+winston.addColors({
+  error: "red",
+  warn: "yellow",
+  info: "green",
+  http: "magenta",
+  verbose: "cyan",
+  debug: "blue",
+  silly: "rainbow",
+});
+
+const consoleFormat = winston.format.combine(
+  winston.format.colorize(),
+  winston.format.timestamp(),
+  winston.format.printf(({ timestamp, level, message, ...meta }) => {
+    return `${timestamp} [${level}]: ${message} ${
+      Object.keys(meta).length ? JSON.stringify(meta) : ""
+    }`;
+  })
+);
+
 const logger = winston.createLogger({
   level: "info",
   format: winston.format.json(),
   defaultMeta: { service: "user-service" },
-  transports: [new winston.transports.File({ filename: "webapp.log" })],
+  transports: [
+    new winston.transports.File({ filename: "webapp.log" }),
+    new WinstonCloudwatch({
+      logGroupName: "/aws/ec2/webapp_csye6225",
+      logStreamName: "webapp/syslog",
+      awsRegion: "us-east-1",
+      jsonMessage: true,
+    }),
+  ],
 });
 
 app.all("/healthz", (req, res) => {
