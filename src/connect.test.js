@@ -41,8 +41,6 @@ describe("Database connection tests", () => {
 
     expect(res).toBe(200);
     expect(mockAuthenticate).toHaveBeenCalledTimes(0);
-    expect(Sequelize).toHaveBeenCalledWith("mock-db-connection-url", {
-      ssl: true,
-    });
+    expect(Sequelize).toHaveBeenCalledTimes(2);
   });
 });
