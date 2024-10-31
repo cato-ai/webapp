@@ -4,13 +4,9 @@ import { sequelize } from "../connect";
 import AWS from "aws-sdk";
 const fs = require("fs");
 
-var config = new AWS.Config({
-  accessKeyId: process.env.AWS_ACCESS_KEY,
-  secretAccessKey: process.env.AWS_SECRET_KEY,
-  region: "us-east-1",
-});
+var config = new AWS.Config();
 
-const S3 = new AWS.S3(config);
+const S3 = new AWS.S3();
 
 export const S3_Bucket = sequelize.define(
   "S3_Bucket",
