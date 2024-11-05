@@ -450,14 +450,20 @@ app.get("/v1/user/self/pic", bodyParser.json(), async (req, res) => {
         if (matches) {
           S3_Bucket.findOne({ where: { user_id: user.dataValues.id } }).then(
             async (s3_data) => {
-              res.statusCode = 200;
-              res.send({
-                data: {
-                  ...s3_data.dataValues,
-                  file_name: `profile_pic.${extension}`,
-                },
-              });
-              logger.info("Found S3 Object Successfully");
+              if (s3_data != null) {
+                res.statusCode = 200;
+                res.send({
+                  data: {
+                    ...s3_data.dataValues,
+                    file_name: `profile_pic.${extension}`,
+                  },
+                });
+                logger.info("Found S3 Object Successfully");
+              } else {
+                logger.error("Could not find S3 data for User");
+                res.statusCode = 404;
+                res.end();
+              }
             }
           );
         } else {
