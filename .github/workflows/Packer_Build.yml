@@ -72,7 +72,9 @@ jobs:
 
       - name: Get AMI ID
         id: ami-id
-        run: tail -2 output.txt | head -2 | awk 'match($0, /ami-.*/) { print substr($0, RSTART, RLENGTH) }' > sudo ami.txt
+        run: |
+          touch ami.txt
+          tail -2 output.txt | head -2 | awk 'match($0, /ami-.*/) { print substr($0, RSTART, RLENGTH) }' > sudo ami.txt
 
       - name: Print AMI ID
         id: print-id
