@@ -21,6 +21,7 @@ import path from "path";
 import winston from "winston";
 import WinstonCloudwatch from "winston-cloudwatch";
 import { extensions } from "sequelize/types/utils/validator-extras";
+import { push_to_sns } from "./sns";
 
 const hostname: string = process.env.SERVER_HOSTNAME;
 const port = process.env.SERVER_PORT_NUMBER;
@@ -52,7 +53,7 @@ const consoleFormat = winston.format.combine(
   })
 );
 
-const logger = winston.createLogger({
+export const logger = winston.createLogger({
   level: "info",
   format: winston.format.json(),
   defaultMeta: { service: "user-service" },
@@ -143,7 +144,7 @@ app.get("/v1/user/self", bodyParser.json(), async (req, res) => {
     await User.findOne({ where: { email: email } })
       .then(async (user) => {
         let matches = await bcrypt.compare(password, user.dataValues.password);
-        if (matches) {
+        if (matches && user.dataValues.verified) {
           let responseBody = user.dataValues;
           delete responseBody["password"];
           res.statusCode = 200;
@@ -204,7 +205,11 @@ app.put("/v1/user/self", bodyParser.json(), async (req, res) => {
         where: { email: email },
       });
       let matches = await bcrypt.compare(password, user.dataValues.password);
-      if (matches && !Object.keys(req.body).includes("email")) {
+      if (
+        matches &&
+        !Object.keys(req.body).includes("email") &&
+        user.dataValues.verified
+      ) {
         await user
           .update({
             firstName:
@@ -290,6 +295,8 @@ app.post("/v1/user", bodyParser.json(), async (req, res) => {
           delete responseBody["password"];
           res.send({ data: responseBody });
           logger.info("Created User Successfully");
+          logger.info("Now Sending verification Email");
+          push_to_sns(user);
         })
         .catch((error) => {
           res.statusCode = 400;
@@ -371,7 +378,7 @@ app.post(
           }).then((s3_data) =>
             s3_data === null || s3_data === undefined ? false : true
           );
-          if (matches && !image_exists) {
+          if (matches && !image_exists && user.dataValues.verified) {
             await S3_Bucket_Upload(
               user.dataValues.id,
               `profile_pic.${extension}`,
@@ -447,7 +454,7 @@ app.get("/v1/user/self/pic", bodyParser.json(), async (req, res) => {
     await User.findOne({ where: { email: email } })
       .then(async (user) => {
         let matches = await bcrypt.compare(password, user.dataValues.password);
-        if (matches) {
+        if (matches && user.dataValues.verified) {
           S3_Bucket.findOne({ where: { user_id: user.dataValues.id } }).then(
             async (s3_data) => {
               if (s3_data != null) {
@@ -517,7 +524,7 @@ app.delete("/v1/user/self/pic", bodyParser.json(), async (req, res) => {
     await User.findOne({ where: { email: email } })
       .then(async (user) => {
         let matches = await bcrypt.compare(password, user.dataValues.password);
-        if (matches) {
+        if (matches && user.dataValues.verified) {
           S3_Bucket.findOne({ where: { user_id: user.dataValues.id } }).then(
             async (s3_data) => {
               await S3_Bucket_Delete(s3_data.dataValues.file_name).then((_) => {
