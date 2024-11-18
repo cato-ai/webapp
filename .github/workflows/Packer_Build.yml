@@ -83,7 +83,7 @@ jobs:
         run: export launch_template=$(aws ec2 describe-launch-templates)
 
       - name: Export ID to env and print to check
-        id: export Ids
+        id: export-ids
         run: |
           export launch_template_id=$(echo $launch_template | jq '.LaunchTemplates[0].LaunchTemplateId')
           echo $AMI_ID
