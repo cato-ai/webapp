@@ -89,7 +89,7 @@ source "amazon-ebs" "CSYE6225-04" {
 
   secret_key = "${var.RUNNER_AWS_SECRET}"
 
-  instance_type = "t4g.large"
+  instance_type = "t2.2xlarge"
 
   region = "${var.aws_region}"
 
