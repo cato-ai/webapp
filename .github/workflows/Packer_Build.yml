@@ -95,3 +95,26 @@ jobs:
         run: |
           echo "ASG_NAME=$(aws autoscaling describe-auto-scaling-groups  | jq '.AutoScalingGroups[0].AutoScalingGroupName' | | tr -d '"')" >> $GITHUB_ENV
           aws autoscaling start-instance-refresh --auto-scaling-group-name $ASG_NAME
+
+      - name: Wait for Instance Refresh Completion
+        id: Waiting-for-refresh
+        run: |
+          while true; do
+            STATUS=$(aws autoscaling describe-instance-refreshes \
+              --auto-scaling-group-name $ASG_NAME \
+              --query "InstanceRefreshes[?InstanceRefreshId=='$REFRESH_ID'].Status" \
+              --output text)
+
+            echo "Current status: $STATUS"
+
+            if [ "$STATUS" == "Successful" ]; then
+              echo "Instance refresh completed successfully."
+              break
+            elif [ "$STATUS" == "Failed" ]; then
+              echo "Instance refresh failed." >&2
+              exit 1
+            else
+              echo "Waiting for instance refresh to complete..."
+              sleep 30
+            fi
+          done
