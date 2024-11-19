@@ -66,13 +66,13 @@ jobs:
         id: validate
         run: packer validate .
 
-      - name: Packer Build
-        id: build
-        run: packer build -var DB_CONNECTION_URL=${{ secrets.DB_CONNECTION_URL }} -var SERVER_HOSTNAME=${{ secrets.SERVER_HOSTNAME }} -var SERVER_PORT_NUMBER=${{ secrets.SERVER_PORT_NUMBER }} -var DB_NAME=${{ secrets.DB_NAME }} -var DB_USERNAME=${{ secrets.DB_USERNAME }} -var DB_PASSWORD=${{ secrets.DB_PASSWORD }} -var RUNNER_AWS_SECRET=${{ secrets.RUNNER_AWS_SECRET }} -var RUNNER_AWS_KEY=${{ secrets.RUNNER_AWS_KEY }} aws.pkr.hcl
+      # - name: Packer Build
+      #   id: build
+      #   run: packer build -var DB_CONNECTION_URL=${{ secrets.DB_CONNECTION_URL }} -var SERVER_HOSTNAME=${{ secrets.SERVER_HOSTNAME }} -var SERVER_PORT_NUMBER=${{ secrets.SERVER_PORT_NUMBER }} -var DB_NAME=${{ secrets.DB_NAME }} -var DB_USERNAME=${{ secrets.DB_USERNAME }} -var DB_PASSWORD=${{ secrets.DB_PASSWORD }} -var RUNNER_AWS_SECRET=${{ secrets.RUNNER_AWS_SECRET }} -var RUNNER_AWS_KEY=${{ secrets.RUNNER_AWS_KEY }} aws.pkr.hcl
 
-      - name: Print AMI ID
-        id: print-id
-        run: echo "AMI_ID=$(jq -r '.builds[0].artifact_id | split(":")[1]' ./manifest.json)" >> $GITHUB_ENV
+      # - name: Print AMI ID
+      #   id: print-id
+      #   run: echo "AMI_ID=$(jq -r '.builds[0].artifact_id | split(":")[1]' ./manifest.json)" >> $GITHUB_ENV
 
       - name: Get Launch Templates
         id: get-launch-template
