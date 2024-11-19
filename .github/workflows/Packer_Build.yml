@@ -102,11 +102,8 @@ jobs:
           --launch-template-data "ImageId=$AMI_ID"
 
       - name: Get ASG Name and Refresh
-          id: get-asg
-          run: |
-            echo "ASG=$(aws autoscaling describe-auto-scaling-groups)" >> $GITHUB_ENV
-            echo "ASG_NAME=$(echo $ASG | jq '.AutoScalingGroups[0].AutoScalingGroupName')" >> $GITHUB_ENV
-            aws autoscaling start-instance-refresh --auto-scaling-group-name $ASG_NAME 
-
-
-
+        id: get-asg
+        run: |
+          echo "ASG=$(aws autoscaling describe-auto-scaling-groups)" >> $GITHUB_ENV
+          echo "ASG_NAME=$(echo $ASG | jq '.AutoScalingGroups[0].AutoScalingGroupName')" >> $GITHUB_ENV
+          aws autoscaling start-instance-refresh --auto-scaling-group-name $ASG_NAME
