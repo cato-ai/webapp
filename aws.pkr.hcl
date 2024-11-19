@@ -128,6 +128,12 @@ build {
     "source.amazon-ebs.CSYE6225-04",
   ]
 
+  post-processor "manifest" {
+    output     = "manifest.json"
+    strip_path = true
+  }
+
+
   provisioner "file" {
     source      = "csye6225.service"
     destination = "/tmp/"
@@ -190,4 +196,5 @@ build {
       "sudo apt-get clean",
     ]
   }
+
 }
