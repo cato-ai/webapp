@@ -98,7 +98,7 @@ jobs:
           --launch-template-id $launch_template_id \
           --version-description NewLaunchTemplateVersionForAMI \
           --source-version 1 \
-          --launch-template-data "ImageId=$AMI_ID"
+          --launch-template-data "{\"ImageId\":\"$AMI_ID\"}"
 
       - name: Get ASG Name and Refresh
         id: get-asg
