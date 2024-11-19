@@ -22,7 +22,7 @@ export const push_to_sns = (user) => {
       );
       return -1;
     }
-    const notification: any = {
+    const notification: email_notification = {
       user_id: user.dataValues.id,
       target_email: user.dataValues.email,
       email_message: `Use this link to verify your email address : ${verification_link}`,
@@ -31,8 +31,7 @@ export const push_to_sns = (user) => {
 
     const publish_message: PublishInput = {
       TopicArn: "user_verification_trigger",
-      MessageStructure: "json",
-      Message: notification,
+      Message: JSON.stringify(notification),
     };
 
     const publishTextPromise = new AWS.SNS({ apiVersion: "2010-03-31" })
