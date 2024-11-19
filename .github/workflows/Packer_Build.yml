@@ -88,10 +88,7 @@ jobs:
 
       - name: Create new Launch Template
         id: refersh-launch-template
-        run: aws ec2 create-launch-template-version \
-          --launch-template-id $launch_template_id \
-          --source-version 1 \
-          --launch-template-data "{\"ImageId\":\"$AMI_ID\"}"
+        run: aws ec2 create-launch-template-version --launch-template-id $launch_template_id  --source-version 1  --launch-template-data "{\"ImageId\":\"$AMI_ID\"}"
 
       - name: Get ASG Name and Refresh
         id: get-asg
