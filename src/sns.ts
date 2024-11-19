@@ -37,7 +37,8 @@ export const push_to_sns = async (user) => {
     getTopicAttribsPromise
       .then((response) => {
         const publish_message: PublishInput = {
-          TopicArn: response.Attributes.TopicArn,
+          TopicArn:
+            "arn:aws:sns:us-east-1:664418983459:user_verification_trigger",
           Message: JSON.stringify(notification),
         };
 
