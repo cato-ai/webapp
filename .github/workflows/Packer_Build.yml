@@ -93,5 +93,5 @@ jobs:
       - name: Get ASG Name and Refresh
         id: get-asg
         run: |
-          echo "ASG_NAME=$(aws autoscaling describe-auto-scaling-groups  | jq '.AutoScalingGroups[0].AutoScalingGroupName')" >> $GITHUB_ENV
+          echo "ASG_NAME=$(aws autoscaling describe-auto-scaling-groups  | jq '.AutoScalingGroups[0].AutoScalingGroupName' | | tr -d '"')" >> $GITHUB_ENV
           aws autoscaling start-instance-refresh --auto-scaling-group-name $ASG_NAME
