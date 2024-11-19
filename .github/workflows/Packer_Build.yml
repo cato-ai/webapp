@@ -83,8 +83,7 @@ jobs:
         run: |
           echo $AMI_ID
           echo $launch_template_id
-          echo "$launch_template_id"
-          echo $launch_template
+          echo "ASG_NAME=$(aws autoscaling describe-auto-scaling-groups  | jq '.AutoScalingGroups[0].AutoScalingGroupName' | tr -d '"')" >> $GITHUB_ENV
 
       # - name: Create new Launch Template
       #   id: version-launch-template
@@ -93,10 +92,9 @@ jobs:
       - name: Get ASG Name and Refresh
         id: get-asg
         run: |
-          echo "ASG_NAME=$(aws autoscaling describe-auto-scaling-groups  | jq '.AutoScalingGroups[0].AutoScalingGroupName')" >> $GITHUB_ENV
           echo $ASG_NAME
-          # REFRESH_ID=$(aws autoscaling start-instance-refresh --auto-scaling-group-name $ASG_NAME --query "InstanceRefreshId" --output text)
-          # echo "REFRESH_ID=$REFRESH_ID" >> $GITHUB_ENV
+          REFRESH_ID=$(aws autoscaling start-instance-refresh --auto-scaling-group-name $ASG_NAME --query "InstanceRefreshId" --output text)
+          echo "REFRESH_ID=$REFRESH_ID" >> $GITHUB_ENV
 
       - name: Wait for Instance Refresh Completion
         id: Waiting-for-refresh
