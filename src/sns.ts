@@ -3,6 +3,7 @@ import { User } from "./Models/User";
 import { DataTypes } from "sequelize";
 import { logger } from ".";
 import { PublishInput } from "aws-sdk/clients/sns";
+import { GetTopicAttributesCommand } from "@aws-sdk/client-sns";
 
 type email_notification = {
   user_id: string;
@@ -12,7 +13,7 @@ type email_notification = {
   email_sent?: Date;
 };
 
-export const push_to_sns = (user) => {
+export const push_to_sns = async (user) => {
   AWS.config.update({ region: "us-east-1" });
   const verification_link = ""; //create api endpoint here with required details, bcrypt for the hash of the username and password,a ling with timestamp to cehck if it's expired or not
   try {
@@ -29,21 +30,31 @@ export const push_to_sns = (user) => {
       email_created: new Date(),
     };
 
-    const publish_message: PublishInput = {
-      TopicArn: "user_verification_trigger",
-      Message: JSON.stringify(notification),
-    };
-
-    const publishTextPromise = new AWS.SNS({ apiVersion: "2010-03-31" })
-      .publish(publish_message)
+    var getTopicAttribsPromise = new AWS.SNS({ apiVersion: "2010-03-31" })
+      .getTopicAttributes({ TopicArn: "user_verification_trigger" })
       .promise();
 
-    publishTextPromise
-      .then((data) => {
-        logger.info("Message published to SNS");
+    getTopicAttribsPromise
+      .then((response) => {
+        const publish_message: PublishInput = {
+          TopicArn: response.Attributes.TopicArn,
+          Message: JSON.stringify(notification),
+        };
+
+        const publishTextPromise = new AWS.SNS({ apiVersion: "2010-03-31" })
+          .publish(publish_message)
+          .promise();
+
+        publishTextPromise
+          .then((data) => {
+            logger.info("Message published to SNS");
+          })
+          .catch((err) => {
+            logger.error(err, "ERROR in publishing to SNS");
+          });
       })
       .catch((err) => {
-        logger.error(err, "ERROR in publishing to SNS");
+        logger.error(err);
       });
   } catch (err) {
     logger.error(err, "ERROR IN push_to_sns method");
