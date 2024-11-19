@@ -76,7 +76,7 @@ jobs:
 
       - name: Get Launch Templates
         id: get-launch-template
-        run: echo "launch_template_id=$(aws ec2 describe-launch-templates | jq ".LaunchTemplates[0].LaunchTemplateId")" >> $GITHUB_ENV
+        run: echo "launch_template_id=$(aws ec2 describe-launch-templates | jq ".LaunchTemplates[0].LaunchTemplateId" | tr -d '"')" >> $GITHUB_ENV
 
       - name: Export ID to env and print to check
         id: export-ids
