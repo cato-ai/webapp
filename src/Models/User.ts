@@ -80,6 +80,17 @@ export const User = sequelize.define(
       allowNull: false,
       defaultValue: false,
     },
+    token: {
+      type: DataTypes.UUID,
+      allowNull: false,
+      defaultValue: DataTypes.UUIDV4,
+      get() {
+        return this.getDataValue("token");
+      },
+      set(value: string) {
+        this.setDataValue("token", value);
+      },
+    },
   },
   {
     timestamps: true,

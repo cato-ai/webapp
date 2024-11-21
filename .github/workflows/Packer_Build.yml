@@ -74,6 +74,13 @@ jobs:
         id: print-id
         run: echo "AMI_ID=$(jq -r '.builds[0].artifact_id | split(":")[1]' ./manifest.json)" >> $GITHUB_ENV
 
+      - name: Configure AWS-cli to demo
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: "${{ secrets.RUNNER_AWS_KEY_DEMO }}"
+          aws-secret-access-key: "${{ secrets.RUNNER_AWS_SECRET_DEMO }}"
+          aws-region: "${{ secrets.RUNNER_AWS_REGION }}"
+
       - name: Get Launch Templates
         id: get-launch-template
         run: echo "launch_template_id=$(aws ec2 describe-launch-templates | jq ".LaunchTemplates[0].LaunchTemplateId" | tr -d '"')" >> $GITHUB_ENV

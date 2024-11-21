@@ -566,6 +566,89 @@ app.delete("/v1/user/self/pic", bodyParser.json(), async (req, res) => {
   );
 });
 
+app.get(`/v1/user/verify/self`, bodyParser.json(), async (req, res) => {
+  statsD.increment(`api.${req.path}.get.calls`);
+  const apiResponseTime = Date.now();
+  const urlParams = url.parse(req.url);
+  try {
+    if (req.query.token === undefined || req.query.email === undefined) {
+      res.statusCode = 400;
+      res.end();
+    } else if (Object.keys(req.query).length !== 2) {
+      res.statusCode = 404;
+      res.end();
+    } else if (
+      Object.keys(req.query)[0] !== "token" &&
+      Object.keys(req.query)[1] !== "email"
+    ) {
+      res.statusCode = 404;
+      res.end();
+    } else {
+      const token = req.query.token;
+      const email = req.query.email;
+      const dbTiming = Date.now();
+      console.log(token, email);
+      await User.findOne({ where: { email: req.query.email } })
+        .then(async (user) => {
+          let matches = user.dataValues.token === token;
+          console.log(
+            Date.now(),
+            user.dataValues.accountCreated.getTime() + 120000,
+            "TIMMEMEEEEEE"
+          );
+          if (Date.now() >= user.dataValues.accountCreated.getTime() + 120000) {
+            res.statusCode = 408;
+            res.end();
+            logger.error("Link expired");
+          } else {
+            console.log("herererererer time ");
+            if (matches && user.dataValues.verified === false) {
+              res.statusCode = 200;
+              logger.info("Found User Successfully");
+              await user
+                .update({
+                  verified: true,
+                })
+                .then((_user) => {
+                  res.statusCode = 204;
+                  res.end();
+                  logger.info("Verified user Successfully");
+                })
+                .catch((error) => {
+                  res.statusCode = 409;
+                  logger.error(
+                    "409, Conflict, could not find User with given credentials"
+                  );
+                  res.send({ message: error });
+                });
+            } else if (matches && user.dataValues.verified === true) {
+              res.statusCode = 208;
+              res.end();
+              logger.info("User already verified, verifying again");
+            } else {
+              res.statusCode = 401;
+              res.end();
+              res.send({ message: "Unauthorized user" });
+              logger.info("401, Unauthorized user, credentials don't match");
+            }
+          }
+          statsD.timing(
+            `db.retrieve.${req.path}.get.response_time`,
+            Date.now() - dbTiming
+          );
+        })
+        .catch((error) => {
+          logger.error("401, Could not find User");
+          res.statusCode = 401;
+          res.send({ message: "here" });
+          res.end();
+        });
+    }
+  } catch (err) {
+    logger.error(err, "Unexpected Error while verifying user");
+  }
+});
+
 app.listen(port, () => {
   logger.info(`Server running at http://${hostname}:${port}/`);
 });
