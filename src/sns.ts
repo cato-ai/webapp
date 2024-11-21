@@ -31,24 +31,9 @@ export const push_to_sns = async (user) => {
       email_message: `Use this link to verify your email address : ${verification_link}`,
       email_created: new Date(),
     };
-    let topicArn = "";
-
-    try {
-      const listTopicsPromise = SNS.listTopics().promise();
-      const data = await listTopicsPromise;
-
-      logger.info(data);
-
-      data.Topics.forEach((topic) => {
-        const topicArn = topic.TopicArn.split(":").pop();
-        logger.info(topicArn);
-      });
-    } catch (err) {
-      logger.error("Error listing SNS topics:", err);
-    }
 
     const publish_message: PublishInput = {
-      TopicArn: topicArn,
+      TopicArn: "arn:aws:sns:us-east-1:762233751904:user_verification_trigger",
       Message: JSON.stringify(notification),
     };
 
