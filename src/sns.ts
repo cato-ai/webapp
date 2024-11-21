@@ -36,26 +36,29 @@ export const push_to_sns = async (user) => {
 
     getTopicAttribsPromise
       .then((response) => {
-        const publish_message: PublishInput = {
-          TopicArn:
-            "arn:aws:sns:us-east-1:664418983459:user_verification_trigger",
-          Message: JSON.stringify(notification),
-        };
-
-        const publishTextPromise = new AWS.SNS({ apiVersion: "2010-03-31" })
-          .publish(publish_message)
-          .promise();
-
-        publishTextPromise
-          .then((data) => {
-            logger.info("Message published to SNS");
-          })
-          .catch((err) => {
-            logger.error(err, "ERROR in publishing to SNS");
-          });
+        logger.info(response);
       })
       .catch((err) => {
         logger.error(err);
+      });
+
+    const publish_message: PublishInput = {
+      TopicArn: "arn:aws:sns:us-east-1:664418983459:user_verification_trigger",
+      Message: JSON.stringify(notification),
+    };
+
+    const publishTextPromise = new AWS.SNS({
+      apiVersion: "2010-03-31",
+    })
+      .publish(publish_message)
+      .promise();
+
+    publishTextPromise
+      .then((data) => {
+        logger.info("Message published to SNS");
+      })
+      .catch((err) => {
+        logger.error(err, "ERROR in publishing to SNS");
       });
   } catch (err) {
     logger.error(err, "ERROR IN push_to_sns method");
