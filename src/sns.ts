@@ -30,18 +30,6 @@ export const push_to_sns = async (user) => {
       email_created: new Date(),
     };
 
-    var getTopicAttribsPromise = new AWS.SNS({ apiVersion: "2010-03-31" })
-      .getTopicAttributes({ TopicArn: "user_verification_trigger" })
-      .promise();
-
-    getTopicAttribsPromise
-      .then((response) => {
-        logger.info(response);
-      })
-      .catch((err) => {
-        logger.error(err);
-      });
-
     const publish_message: PublishInput = {
       TopicArn: "arn:aws:sns:us-east-1:664418983459:user_verification_trigger",
       Message: JSON.stringify(notification),
