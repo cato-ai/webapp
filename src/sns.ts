@@ -15,7 +15,7 @@ type email_notification = {
 
 export const push_to_sns = async (user) => {
   AWS.config.update({ region: "us-east-1" });
-  const verification_link = ""; //create api endpoint here with required details, bcrypt for the hash of the username and password, a long with timestamp to cehck if it's expired or not
+  const verification_link = "http://demo.sampurna.xyz/v1/user/verify/self"; //create api endpoint here with required details, bcrypt for the hash of the username and password, a long with timestamp to cehck if it's expired or not
   try {
     if (user === null || user === undefined) {
       logger.error(
