@@ -89,7 +89,7 @@ source "amazon-ebs" "CSYE6225-04" {
 
   secret_key = "${var.RUNNER_AWS_SECRET}"
 
-  instance_type = "t2.2xlarge"
+  instance_type = "t2.medium"
 
   region = "${var.aws_region}"
 
@@ -119,6 +119,7 @@ source "amazon-ebs" "CSYE6225-04" {
     device_name           = "/dev/sda1"
     volume_size           = 25
     volume_type           = "gp2"
+    encrypted             = true
   }
 
 }
