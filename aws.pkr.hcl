@@ -119,9 +119,7 @@ source "amazon-ebs" "CSYE6225-04" {
     device_name           = "/dev/sda1"
     volume_size           = 25
     volume_type           = "gp2"
-    encrypted             = true
   }
-
 }
 
 build {
