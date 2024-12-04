@@ -119,6 +119,57 @@ app.all("/healthz", (req, res) => {
   statsD.timing(`api.${req.path}.response_time`, responseTime);
 });
 
+app.all("/cicd", (req, res) => {
+  const startTime = Date.now();
+
+  statsD.increment(`api.${req.path}.calls`);
+
+  res.setHeader("cache-control", "no-cache");
+
+  const urlParams = url.parse(req.url);
+
+  if (urlParams.query !== null) {
+    logger.error("400, Query Params present");
+    res.statusCode = 400;
+    res.end();
+  } else if (req.url === "/healthz" && req.method === "GET") {
+    let body = "";
+    req.on("data", (chunk) => {
+      body += chunk;
+    });
+    req.on("end", async () => {
+      if (body) {
+        logger.error("400, Req contains Body");
+        res.statusCode = 400;
+        res.end();
+      } else {
+        const statusCode = await connectToDb(res);
+        res.statusCode = statusCode;
+        switch (statusCode) {
+          case 200:
+            res.end();
+            logger.info("200, OK!");
+            break;
+          case 503:
+            res.end();
+            logger.error("503, Cannot connect to DB!");
+            break;
+        }
+      }
+    });
+  } else if (req.url === "/healthz" && req.method !== "GET") {
+    logger.error("405, Wrong Type of Request");
+    res.statusCode = 405;
+    res.end();
+  } else {
+    logger.error("404,  Not found");
+    res.statusCode = 404;
+    res.end();
+  }
+  const responseTime = Date.now() - startTime;
+  statsD.timing(`api.${req.path}.response_time`, responseTime);
+});
+
 app.get("/v1/user/self", bodyParser.json(), async (req, res) => {
   statsD.increment(`api.${req.path}.get.calls`);
   const apiResponseTime = Date.now();
